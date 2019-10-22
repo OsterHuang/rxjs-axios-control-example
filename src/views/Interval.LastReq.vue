@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>每隔一段時間就發送Request, 但是Response要是最新的</h1>
+    <h1>每隔一段時間就發送Request, 但是Response要取最後一次發送的Request</h1>
     <div class="btn-area">
       <button v-show="!subscription" :disabled="isLoading" @click="handleStart">開始</button>
       <button v-show="!!subscription" @click="handleEnd">停止</button>
@@ -137,22 +137,11 @@ export default {
 <style lang="stylus">
 .fade-enter-active,
 .fade-leave-active
-    transition: opacity .5s
+  transition: opacity .5s
 
 .fade-enter,
 .fade-leave-to
-    opacity: 0
-// .slide-fade-enter-active {
-//   transition: all .3s ease;
-// }
-// .slide-fade-leave-active {
-//   transition: all .8s cubic-bezier(1.0, 0.5, 0.8, 1.0);
-// }
-// .slide-fade-enter, .slide-fade-leave-to
-// /* .slide-fade-leave-active for <2.1.8 */ {
-//   transform: translateX(10px);
-//   opacity: 0;
-// }
+  opacity: 0
 
 .next
   background-color #ccc
