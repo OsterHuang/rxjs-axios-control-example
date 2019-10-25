@@ -9,8 +9,8 @@ npm install
 ```
 npm run serve
 ```
-
-#### 建議使用此指令起啟動 development，這邊會順便啟動mock-server
+####  
+建議使用此指令起啟動 development，這邊會順便啟動mock-server
 ```
 npm run dev
 ```
