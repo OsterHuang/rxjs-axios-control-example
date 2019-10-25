@@ -8,21 +8,18 @@
     <div class="result">
       <pre>{{ message }}</pre>
     </div>
-
-    <hr>
-
-    <div class="btn-area">
-      <button :disabled="isWrapLoading" @click="handleWrapTwoError">[使用rx包裝promise]三筆中，二筆失敗</button>
-    </div>
-    <div class="result">
-      <pre class="text-align-left">{{ wrapMessage }}</pre>
-    </div>
   </div>
 </template>
 
 <script>
-import { merge, Observable } from 'rxjs'
-import { reduce } from 'rxjs/operators'
+import { merge, Observable, of } from 'rxjs'
+import {
+  reduce,
+  catchError,
+  switchMap,
+  mergeMap,
+  onErrorResumeNext
+} from 'rxjs/operators'
 import { createTimeout, messageLog } from '@/util'
 
 const asyncProcessForce = (...promises) => {
@@ -75,56 +72,28 @@ export default {
     },
     handleTwoError() {
       const startTime = new Date()
-      this.message = ''
+      this.message = 'Start handle two error - \n'
 
       this.isLoading = true
-      merge(
-        createTimeout({ name: 'P1', duration: 3000 }),
-        createTimeout({ name: 'P2', duration: 4000, hasError: true }),
-        createTimeout({ name: 'P3', duration: 5000, hasError: true })
-      ).subscribe({
-        next: v => { this.message += messageLog(v, startTime) + '\n' },
-        error: err => {
-          this.message += messageLog(err, startTime) + '\n'
-          this.isLoading = false
-        },
-        complete: () => {
-          this.message += messageLog('All completion - ', startTime) + '\n'
-          this.isLoading = false
-        }
-      })
-    },
-    handleWrapTwoError() {
-      const startTime = new Date()
-      this.wrapMessage = ''
-
-      const observables = asyncProcessForce(
-        new Promise((resolve, reject) => { setTimeout(() => resolve('P1 Success'), 3000) }),
-        // new Promise((resolve, reject) => { setTimeout(() => resolve('P2 Success'), 4000) }),
-        new Promise((resolve, reject) => { setTimeout(() => reject('P2 failure - bad guy...'), 4000) }),
-        // new Promise((resolve, reject) => { setTimeout(() => resolve('P3 Success'), 5000) })
-        new Promise((resolve, reject) => { setTimeout(() => reject('P3 failure - This is should be the http error'), 5000) })
+      of(
+        { name: 'P1', duration: 1000 },
+        { name: 'P2', duration: 2000, hasError: true, throwError: false },
+        { name: 'P3', duration: 3000, hasError: false }
       )
-
-      this.isWrapLoading = true
-      merge(
-        ...observables
-        // createTimeout({ name: 'P1', duration: 3000 }),
-        // createTimeout({ name: 'P2', duration: 4000, hasError: true }),
-        // createTimeout({ name: 'P3', duration: 5000, hasError: false })
-      ).pipe(
-        reduce((acc, val, idx) => acc.concat(val), [])
-      ).subscribe({
-        next: v => { this.wrapMessage += messageLog(JSON.stringify(v, null, 2), startTime) + '\n' },
-        error: err => {
-          this.wrapMessage += messageLog(err, startTime) + '\n'
-          this.isWrapLoading = false
-        },
-        complete: () => {
-          this.wrapMessage += messageLog('All completion - ', startTime) + '\n'
-          this.isWrapLoading = false
-        }
-      })
+        .pipe(
+          mergeMap(v => createTimeout(v).pipe(catchError(err => of(err))))
+        )
+        .subscribe({
+          next: v => { this.message += messageLog(v, startTime) + '\n' },
+          error: err => {
+            this.message += 'Subscribe error: ' + messageLog(err, startTime) + '\n'
+            this.isLoading = false
+          },
+          complete: () => {
+            this.message += messageLog('All completion - ', startTime) + '\n'
+            this.isLoading = false
+          }
+        })
     }
   }
 }

@@ -29,21 +29,21 @@ fromEventPattern(
     // Call refresh token - 因為這邊 call api 失敗不能停整個 observable 所以必須自己再做新的串流catch error
     concatMap(config => {
       return from(request({ ...config, url: '/refreshToken' })).pipe(
-        map(v => { console.log('Send refresh token ', v); return v }),
+        map(v => { return v }),
         catchError(error => {
-          console.log('Refresh token error: ', error)
+          // console.log('Refresh token error: ', error)
           config.resolve({ success: false, error })
           return EMPTY
         }),
         // Call retry token - 因為這邊 call api 失敗不能停整個 observable 所以必須自己再做新的串流catch error
         mergeMap(v => {
-          console.log('Retrying after refreshing success: ', config.data)
+          // console.log('Retrying after refreshing success: ', config.data)
           const newData = { ...config.data }
           newData.pass = !newData.retryPass
           return from(request({ ...config, data: newData }))
             .pipe(
               map(retryResult => {
-                console.log('Send Retry by new token: ', retryResult)
+                // console.log('Send Retry by new token: ', retryResult)
                 config.resolve({ success: true, data: retryResult })
                 return retryResult
               }),
