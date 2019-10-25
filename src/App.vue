@@ -13,7 +13,7 @@
       >
       <div>
         <router-link to="/">異步多筆 - 單筆失敗</router-link>
-        <span> | </span><router-link to="/FetchAll.OneErrorContinue">異步多筆 - 單筆其他繼續</router-link>
+        <span> | </span><router-link to="/FetchAll.OneErrorContinue">異步多筆 - 單筆失敗，等待其他結束</router-link>
         <span> | </span><router-link to="/Interval.LastReq">同request異步 - respones 後蓋前</router-link>
         <span> | </span><router-link to="/SampleRefreshToken">Refresh Expired Token</router-link>
       </div>

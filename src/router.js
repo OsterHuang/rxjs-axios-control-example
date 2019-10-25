@@ -18,6 +18,11 @@ const routes = [
     name: 'Interval.LastReq',
     path: '/Interval.LastReq',
     component: () => import('@/views/Interval.LastReq.vue')
+  },
+  {
+    name: 'SampleRefreshToken',
+    path: '/SampleRefreshToken',
+    component: () => import('@/views/SampleRefreshToken/index.vue')
   }
 ]
 
